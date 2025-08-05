@@ -1,3 +1,4 @@
+
 from datetime import datetime
 
 disponivel = {"Standard": 10, "Premium": 5, "Luxo": 3}
@@ -6,41 +7,41 @@ resp_maior_valor = resp_maior_duracao = ""
 
 while True:
     nome = input("\nNome do responsável: ")
-    if not nome or nome[0].isdigit():
-        print("Erro: Nome inválido.")
+    if not nome:
+        print("Nome inválido.")
         break
 
     while True:
         try:
-            ci = datetime.strptime(input("Check-in (dd/mm/aaaa): "), "%d/%m/%Y")
-            co = datetime.strptime(input("Check-out (dd/mm/aaaa): "), "%d/%m/%Y")
-            if co <= ci: print("Erro: Check-out inválido."); break
-        except: print("Erro: Data inválida."); break
+            Checkin = datetime.strptime(input("Check-in (dd/mm/aaaa): "), "%d/%m/%Y")
+            Checkout = datetime.strptime(input("Check-out (dd/mm/aaaa): "), "%d/%m/%Y")
+            if Checkout <= Checkin: print("Check-out inválido."); break
+        except: print("Data inválida."); break
 
-        tipo = input("Tipo de quarto (Standard, Premium, Luxo): ")
-        if tipo not in disponivel: print("Erro: Tipo inválido."); break
+        tipo_de_Quarto = input("Tipo de quarto (Standard, Premium, Luxo): ")
+        if tipo_de_Quarto not in disponivel: print("Tipo de Quarto inválido."); break
 
         try:
-            qtd = int(input("Quantidade de quartos: "))
-            if qtd <= 0 or qtd > disponivel[tipo]:
-                print("Erro: Quantidade inválida ou indisponível."); break
-        except: print("Erro: Valor inválido."); break
+            quantidade_de_Quartos = int(input("Quantidade de quartos: "))
+            if quantidade_de_Quartos <= 0 or quantidade_de_Quartos > disponivel[tipo_de_Quarto]:
+                print("Quantidade inválida ou indisponível."); break
+        except: print("Valor inválido."); break
 
-        dias = (co - ci).days
-        diaria = {"Standard": 100, "Premium": 180, "Luxo": 250}[tipo]
-        total = diaria * dias * qtd
+        dias = (Checkout - Checkin).days
+        diaria = {"Standard": 100, "Premium": 180, "Luxo": 250}[tipo_de_Quarto]
+        total = diaria * dias * quantidade_de_Quartos
 
         # Atualizações
         total_reservas += 1
         soma_valores += total
         if total > maior_valor: maior_valor, resp_maior_valor = total, nome
         if dias > maior_dias: maior_dias, resp_maior_duracao = dias, nome
-        disponivel[tipo] -= qtd
+        disponivel[tipo_de_Quarto] -= quantidade_de_Quartos
 
         # Saída
         print(f"\n✅ Reserva de {nome}")
-        print(f"Check-in: {ci.strftime('%d/%m/%Y')} | Check-out: {co.strftime('%d/%m/%Y')}")
-        print(f"Dias: {dias} | Tipo: {tipo} | Quartos: {qtd} | Total: R$ {total:.2f}")
+        print(f"Check-in: {Checkin.strftime('%d/%m/%Y')} | Check-out: {Checkout.strftime('%d/%m/%Y')}")
+        print(f"Dias: {dias} | Tipo: {tipo_de_Quarto} | Quartos: {quantidade_de_Quartos} | Total: R$ {total:.2f}")
 
         # Menu final
         op = input("\n[1] Encerrar programa  [2] Novo cliente  [3] Nova reserva\nOpção: ")
