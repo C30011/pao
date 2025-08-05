@@ -1,64 +1,63 @@
-#Entrada de dados
+from datetime import datetime
 
-nome_responsavel = input("Nome do responsável pela reserva: ")
-if not nome_responsavel:
-    print("O nome do responsável não pode estar vazio.")
-    exit()
+disponivel = {"Standard": 10, "Premium": 5, "Luxo": 3}
+total_reservas = soma_valores = maior_valor = maior_dias = 0
+resp_maior_valor = resp_maior_duracao = ""
 
-dia_checkin = int(input("Dia do check-in: "))
-mes_checkin = int(input("Mês do check-in: "))
-ano_checkin = int(input("Ano do check-in: "))
+while True:
+    nome = input("\nNome do responsável: ")
+    if not nome or nome[0].isdigit():
+        print("Erro: Nome inválido.")
+        break
 
-dia_checkout = int(input("Dia do check-out: "))
-mes_checkout = int(input("Mês do check-out: "))
-ano_checkout = int(input("Ano do check-out: "))
+    while True:
+        try:
+            ci = datetime.strptime(input("Check-in (dd/mm/aaaa): "), "%d/%m/%Y")
+            co = datetime.strptime(input("Check-out (dd/mm/aaaa): "), "%d/%m/%Y")
+            if co <= ci: print("Erro: Check-out inválido."); break
+        except: print("Erro: Data inválida."); break
 
-#Verificação
+        tipo = input("Tipo de quarto (Standard, Premium, Luxo): ")
+        if tipo not in disponivel: print("Erro: Tipo inválido."); break
 
-if ano_checkout < ano_checkin or \
-   (ano_checkout == ano_checkin and mes_checkout < mes_checkin) or \
-   (ano_checkout == ano_checkin and mes_checkout == mes_checkin and dia_checkout <= dia_checkin): 
-    print("A data de check-out deve ser posterior à data de check-in.")
-    exit()
+        try:
+            qtd = int(input("Quantidade de quartos: "))
+            if qtd <= 0 or qtd > disponivel[tipo]:
+                print("Erro: Quantidade inválida ou indisponível."); break
+        except: print("Erro: Valor inválido."); break
 
-if mes_checkin and mes_checkout > 12:
-    print("Mes Invalido")
-    exit()
-if mes_checkin and mes_checkout <= 0:
-    print("Mes Invalido")
-    exit()
+        dias = (co - ci).days
+        diaria = {"Standard": 100, "Premium": 180, "Luxo": 250}[tipo]
+        total = diaria * dias * qtd
 
-if dia_checkin and dia_checkout > 31:
-    print("Essa data não existe")
+        # Atualizações
+        total_reservas += 1
+        soma_valores += total
+        if total > maior_valor: maior_valor, resp_maior_valor = total, nome
+        if dias > maior_dias: maior_dias, resp_maior_duracao = dias, nome
+        disponivel[tipo] -= qtd
 
-if dia_checkin and dia_checkout <= 0:
-    print("Essa data não existe")
+        # Saída
+        print(f"\n✅ Reserva de {nome}")
+        print(f"Check-in: {ci.strftime('%d/%m/%Y')} | Check-out: {co.strftime('%d/%m/%Y')}")
+        print(f"Dias: {dias} | Tipo: {tipo} | Quartos: {qtd} | Total: R$ {total:.2f}")
 
-# 2 parte:
-tipo_quarto = input("Tipo de quarto (Standard, Premium, Luxo): ")
-if tipo_quarto not in ["Standard", "Premium", "Luxo"]:
-    print("Tipo de quarto inválido.")
-    exit()
+        # Menu final
+        op = input("\n[1] Encerrar programa  [2] Novo cliente  [3] Nova reserva\nOpção: ")
+        if op == "1": break
+        elif op == "2": break
+        elif op == "3": continue
+        else: print("Opção inválida. Encerrando."); break
+    if op == "1": break
 
-
-# Cálculo do valor total da reserva
-    
-if tipo_quarto == "Standard":
-    valor_diaria = 100
-elif tipo_quarto == "Premium":
-    valor_diaria = 180
-else:  # tipo_quarto == "Luxo"
-    valor_diaria = 250
-
-# Considerando que a diferença entre as datas é em dias (simplificação)
-total_dias = (ano_checkout - ano_checkin) * 360 + (mes_checkout - mes_checkin) * 30 + (dia_checkout - dia_checkin)
-valor_total = valor_diaria * total_dias
-
-# Saída de dados
-print("\nDados da Reserva:")
-print(f"Responsável: {nome_responsavel}")
-print(f"Check-in: {dia_checkin}/{mes_checkin}/{ano_checkin}")
-print(f"Check-out: {dia_checkout}/{mes_checkout}/{ano_checkout}")
-print(f"Total de Dias na Reserva:{total_dias}")
-print(f"Tipo de Quarto: {tipo_quarto}")
-print(f"Valor Total: R$ {valor_total:.2f}")
+# Estatísticas
+if total_reservas:
+    media = soma_valores / total_reservas
+    print(f"\n📊 Estatísticas:")
+    print(f"Total reservas: {total_reservas}")
+    print(f"Total arrecadado: R$ {soma_valores:.2f}")
+    print(f"Valor médio: R$ {media:.2f}")
+    print(f"Reserva mais cara: {resp_maior_valor} - R$ {maior_valor:.2f}")
+    print(f"Reserva mais longa: {resp_maior_duracao} - {maior_dias} dias")
+else:
+    print("\nNenhuma reserva registrada.")
